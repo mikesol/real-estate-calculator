@@ -20,17 +20,37 @@ def main():
     st.set_page_config(page_title="Sustainable Real Estate Calculator", page_icon="🏢", layout="wide")
     
     st.title("Sustainable Real Estate Investment Calculator")
-    st.markdown("""
-    This tool calculates sustainable investment percentages for real estate portfolios according to 
-    EU Taxonomy, SFDR, and industry guidelines from ASPIM and AMF.
-    """)
     
-    # Sidebar for navigation
-    st.sidebar.title("Navigation")
-    pages = ["Dashboard", "Fund Information", "Direct Assets", "SCIs", 
-             "Controlled Participations", "Uncontrolled Participations", 
-             "Minority Stakes", "PE Fund Participations"]
-    page = st.sidebar.radio("Go to", pages)
+    # Main description with tooltips for regulations
+    eu_taxonomy_tooltip = """
+    **EU Taxonomy for Sustainable Activities**
+    - Regulation (EU) 2020/852
+    - Technical Screening Criteria for buildings (Delegated Act C(2021) 2800)
+    - Climate Delegated Act (EU) 2021/2139 for climate change mitigation and adaptation
+    """
+    
+    sfdr_tooltip = """
+    **Sustainable Finance Disclosure Regulation (SFDR)**
+    - Regulation (EU) 2019/2088
+    - Article 8: Products promoting environmental/social characteristics
+    - Article 9: Products with sustainable investment as their objective
+    - Regulatory Technical Standards (RTS) on ESG disclosures (C(2022) 1931)
+    """
+    
+    industry_tooltip = """
+    **Industry Guidelines**
+    - ASPIM (Association française des Sociétés de Placement Immobilier) C-ISR methodologies
+    - AMF (Autorité des marchés financiers) Position-Recommendation DOC-2020-03
+    - ASPIM Position Paper on Taxonomy
+    - ASPIM Article 29 LEC Position
+    """
+    
+    st.markdown("""
+    This tool calculates sustainable investment percentages for real estate portfolios according to:
+    - [EU Taxonomy]() regulations 
+    - [SFDR]() requirements
+    - [Industry guidelines]() from ASPIM and AMF
+    """, help=f"{eu_taxonomy_tooltip}\n\n{sfdr_tooltip}\n\n{industry_tooltip}")
     
     # Initialize session state
     if 'calculator' not in st.session_state:
@@ -58,22 +78,39 @@ def main():
     if 'pe_fund_participations' not in st.session_state:
         st.session_state.pe_fund_participations = []
     
+    # Initialize page session state if not present
+    if 'page' not in st.session_state:
+        st.session_state.page = "Dashboard"
+    
+    # Sidebar for navigation
+    st.sidebar.title("Navigation")
+    pages = ["Dashboard", "Fund Information", "Direct Assets", "SCIs", 
+             "Controlled Participations", "Uncontrolled Participations", 
+             "Minority Stakes", "PE Fund Participations"]
+    
+    # Use the page selected in the sidebar, but also update if navigation buttons are clicked
+    selected_page = st.sidebar.radio("Go to", pages, index=pages.index(st.session_state.page))
+    
+    # Update session state if sidebar selection changes
+    if selected_page != st.session_state.page:
+        st.session_state.page = selected_page
+    
     # Display appropriate page based on selection
-    if page == "Dashboard":
+    if st.session_state.page == "Dashboard":
         display_dashboard()
-    elif page == "Fund Information":
+    elif st.session_state.page == "Fund Information":
         display_fund_information()
-    elif page == "Direct Assets":
+    elif st.session_state.page == "Direct Assets":
         display_direct_assets()
-    elif page == "SCIs":
+    elif st.session_state.page == "SCIs":
         display_scis()
-    elif page == "Controlled Participations":
+    elif st.session_state.page == "Controlled Participations":
         display_controlled_participations()
-    elif page == "Uncontrolled Participations":
+    elif st.session_state.page == "Uncontrolled Participations":
         display_uncontrolled_participations()
-    elif page == "Minority Stakes":
+    elif st.session_state.page == "Minority Stakes":
         display_minority_stakes()
-    elif page == "PE Fund Participations":
+    elif st.session_state.page == "PE Fund Participations":
         display_pe_fund_participations()
     
     # Add a sample data button to the sidebar
@@ -89,6 +126,10 @@ def display_dashboard():
     
     if not st.session_state.calculator.fund_name:
         st.warning("Please enter fund information to start the calculation.")
+        # Add navigation button to Fund Information
+        if st.button("Go to Fund Information →"):
+            st.session_state["page"] = "Fund Information"
+            st.experimental_rerun()
         return
     
     # Recalculate results with the current data
@@ -128,17 +169,34 @@ def display_dashboard():
     else:
         st.error("Limited sustainable investment proportion (<20%)")
     
-    # Display regulatory classification suggestion
+    # Display regulatory classification suggestion with tooltip
+    sfdr_classification_tooltip = """
+    **SFDR Classification Guidance**
+    
+    Based on SFDR Regulation (EU) 2019/2088 and industry practices:
+    
+    - **Article 6**: Financial products with no sustainability-related claims
+    - **Article 8**: Financial products that promote environmental or social characteristics
+      - 20-50%: Modest sustainable investment proportion
+      - >50%: Substantial sustainable investment proportion
+    - **Article 9**: Financial products that have sustainable investment as their objective
+      - Generally requires >80% sustainable investments
+      - Must have clear environmental/social objective
+      - All investments must follow "Do No Significant Harm" principle
+    
+    Source: SFDR RTS (C(2022) 1931) and ASPIM guidance
+    """
+    
     st.subheader("Regulatory Classification Guidance")
     
     if sustainable_percentage >= 50:
-        st.info("✅ Qualifies for Article 8 with sustainable investments")
+        st.info("✅ Qualifies for Article 8 with sustainable investments", help=sfdr_classification_tooltip)
         if sustainable_percentage >= 80:
-            st.info("✅ May consider Article 9 classification (if environmental/social objective is the target)")
+            st.info("✅ May consider Article 9 classification (if environmental/social objective is the target)", help=sfdr_classification_tooltip)
     elif sustainable_percentage >= 20:
-        st.info("✅ Qualifies for Article 8")
+        st.info("✅ Qualifies for Article 8", help=sfdr_classification_tooltip)
     else:
-        st.info("✅ Consider Article 6 classification")
+        st.info("✅ Consider Article 6 classification", help=sfdr_classification_tooltip)
     
     # Display breakdown table
     st.subheader("Investment Category Breakdown")
@@ -203,10 +261,21 @@ def display_dashboard():
         file_name="sustainable_real_estate_report.json",
         mime="application/json"
     )
+    
+    # Add navigation buttons
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col2:
+        if st.button("Go to Fund Information →"):
+            st.session_state["page"] = "Fund Information"
+            st.experimental_rerun()
 
 def display_fund_information():
     """Display and edit fund information."""
     st.header("Fund Information")
+    
+    # Add dashboard info message
+    st.info("💡 View calculation results on the Dashboard page")
     
     col1, col2, col3 = st.columns(3)
     
@@ -237,8 +306,33 @@ def display_fund_information():
         st.session_state.calculator.reporting_date = reporting_date
         st.success("Fund information saved successfully!")
     
-    # Sustainability criteria thresholds
+    # Sustainability criteria thresholds with regulation references
     st.subheader("Sustainability Criteria Thresholds")
+    
+    threshold_tooltip = """
+    **Sustainability Criteria Thresholds**
+    
+    These thresholds are derived from the following regulations and methodologies:
+    
+    1. **UN SDG Score**: 
+       - Default minimum: 2.5/10 (Rothschild methodology)
+       - Measures positive contribution to environmental/social objectives
+       - Required by SFDR Article 2(17)
+    
+    2. **ESG Score**:
+       - Default minimum: 8/20 (ASPIM C-ISR methodology)
+       - Covers governance aspects required by SFDR
+       - Based on internal ESG assessment framework
+    
+    3. **MSCI Score**:
+       - Default minimum: 4/10 (Industry practice)
+       - Alternative to internal ESG rating
+       - Covers governance requirements of SFDR
+    
+    These thresholds determine which investments qualify as "sustainable investments" under SFDR Article 2(17) and follow industry best practices from ASPIM C-ISR methodology.
+    """
+    
+    st.markdown("ℹ️ These thresholds determine which assets qualify as sustainable investments", help=threshold_tooltip)
     
     col1, col2, col3 = st.columns(3)
     
@@ -248,7 +342,8 @@ def display_fund_information():
             min_value=0.0,
             max_value=10.0,
             value=st.session_state.calculator.min_sdg_score,
-            step=0.1
+            step=0.1,
+            help="Default: 2.5 (Rothschild methodology). Measures positive contribution to environmental/social objectives as required by SFDR Article 2(17)."
         )
     
     with col2:
@@ -257,7 +352,8 @@ def display_fund_information():
             min_value=0.0,
             max_value=20.0,
             value=st.session_state.calculator.min_esg_score,
-            step=0.1
+            step=0.1,
+            help="Default: 8.0 (ASPIM C-ISR methodology). Covers governance aspects required by SFDR using internal ESG assessment."
         )
     
     with col3:
@@ -266,7 +362,8 @@ def display_fund_information():
             min_value=0.0,
             max_value=10.0,
             value=st.session_state.calculator.min_msci_score,
-            step=0.1
+            step=0.1,
+            help="Default: 4.0 (Industry practice). Alternative to internal ESG rating, covers governance requirements of SFDR."
         )
     
     if st.button("Save Thresholds"):
@@ -274,10 +371,21 @@ def display_fund_information():
         st.session_state.calculator.min_esg_score = min_esg_score
         st.session_state.calculator.min_msci_score = min_msci_score
         st.success("Threshold values saved successfully!")
+    
+    # Add navigation buttons
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col2:
+        if st.button("Next: Direct Assets →"):
+            st.session_state["page"] = "Direct Assets"
+            st.experimental_rerun()
 
 def display_direct_assets():
     """Display and edit direct assets."""
     st.header("Direct Assets")
+    
+    # Add dashboard info message
+    st.info("💡 View calculation results on the Dashboard page")
     
     # Initialize asset_to_edit
     asset_to_edit = 0
@@ -329,6 +437,96 @@ def display_direct_assets():
     # Form to add or edit an asset
     st.subheader("Add New Asset" if not st.session_state.direct_assets else "Edit Asset")
     
+    # Create tooltips for the sustainability criteria
+    epc_tooltip = """
+    **Energy Performance Certificate (EPC) Rating**
+    
+    According to EU Taxonomy Climate Delegated Act (EU) 2021/2139:
+    - EPC Class A qualifies for Taxonomy alignment (for buildings built before Dec 31, 2020)
+    - Based on primary energy demand performance
+    
+    Source: Technical Screening Criteria for climate change mitigation
+    """
+    
+    top15_tooltip = """
+    **Top 15% of Building Stock**
+    
+    According to EU Taxonomy Climate Delegated Act (EU) 2021/2139:
+    - Buildings within the top 15% of the national or regional building stock qualify
+    - Based on operational Primary Energy Demand (PED)
+    - Applies to buildings built before December 31, 2020
+    
+    Source: Technical Screening Criteria for buildings (Annex I)
+    """
+    
+    nzeb_tooltip = """
+    **Nearly Zero-Energy Building (NZEB) -10%**
+    
+    According to EU Taxonomy Climate Delegated Act (EU) 2021/2139:
+    - Buildings that exceed NZEB requirements by 10% 
+    - Applies to buildings built after December 31, 2020
+    - "NZEB-10%" means primary energy demand 10% lower than NZEB requirements
+    
+    Source: Technical Screening Criteria for new construction (Annex I)
+    """
+    
+    sdg_tooltip = """
+    **UN Sustainable Development Goals (SDGs) Score**
+    
+    - Based on SFDR Regulatory Technical Standards (RTS) sustainability assessment
+    - Minimum threshold of 2.5/10 based on Rothschild methodology
+    - Measures positive contribution to environmental/social objectives
+    - Required for SFDR sustainable investment qualification
+    
+    Source: SFDR RTS (C(2022) 1931) and Rothschild sustainable investment methodology
+    """
+    
+    esg_tooltip = """
+    **ESG Score (0-20)**
+    
+    - Internal ESG rating on a 0-20 scale
+    - Minimum threshold of 8/20 based on ASPIM C-ISR methodology
+    - Covers governance aspects of sustainable investment criteria
+    - Required for SFDR sustainable investment qualification
+    
+    Source: ASPIM C-ISR methodology and SFDR Article 2(17)
+    """
+    
+    msci_tooltip = """
+    **MSCI Score (0-10)**
+    
+    - External ESG rating provided by MSCI
+    - Minimum threshold of 4/10 based on industry practices
+    - Alternative to internal ESG rating for governance assessment
+    - Required for SFDR sustainable investment qualification
+    
+    Source: Industry standard based on MSCI ESG Ratings
+    """
+    
+    dnsh_tooltip = """
+    **Do No Significant Harm (DNSH) Principle**
+    
+    Derived from SFDR Article 2(17) and EU Taxonomy:
+    - Ensures investments don't significantly harm any environmental objective
+    - Includes compliance with minimum safeguards (OECD Guidelines, UN Guiding Principles)
+    - Necessary condition for sustainable investment qualification
+    - Required assessment for both SFDR and EU Taxonomy compliance
+    
+    Source: SFDR Article 2(17) and EU Taxonomy Article 17
+    """
+    
+    renovation_tooltip = """
+    **Renovation Energy/GHG Reduction**
+    
+    According to EU Taxonomy Climate Delegated Act (EU) 2021/2139:
+    - Renovations must achieve at least 30% reduction in primary energy demand
+    - Alternative criterion: 30% reduction in greenhouse gas emissions
+    - Compared to pre-renovation performance
+    - Qualifies for Taxonomy alignment under "Renovation of existing buildings"
+    
+    Source: Technical Screening Criteria for building renovation (Annex I)
+    """
+    
     asset_to_add = Asset(
         asset_id="",
         name="",
@@ -348,36 +546,41 @@ def display_direct_assets():
         epc_rating = st.selectbox(
             "EPC Rating",
             ["", "A", "B", "C", "D", "E", "F", "G"],
-            index=0 if not asset_to_add.epc_rating else ["", "A", "B", "C", "D", "E", "F", "G"].index(asset_to_add.epc_rating)
+            index=0 if not asset_to_add.epc_rating else ["", "A", "B", "C", "D", "E", "F", "G"].index(asset_to_add.epc_rating),
+            help=epc_tooltip
         )
-        top_15_percent = st.checkbox("In Top 15% of Building Stock", value=asset_to_add.top_15_percent)
+        top_15_percent = st.checkbox("In Top 15% of Building Stock", value=asset_to_add.top_15_percent, help=top15_tooltip)
     
     with col2:
-        nzeb_compliant = st.checkbox("NZEB -10% Compliant", value=asset_to_add.nzeb_compliant)
+        nzeb_compliant = st.checkbox("NZEB -10% Compliant", value=asset_to_add.nzeb_compliant, help=nzeb_tooltip)
         un_sdg_score = st.slider(
             "UN SDG Score (0-10)",
             min_value=0.0,
             max_value=10.0,
             value=asset_to_add.un_sdg_score if asset_to_add.un_sdg_score is not None else 0.0,
-            step=0.1
+            step=0.1,
+            help=sdg_tooltip
         )
         esg_score = st.slider(
             "ESG Score (0-20)",
             min_value=0.0,
             max_value=20.0,
             value=asset_to_add.esg_score if asset_to_add.esg_score is not None else 0.0,
-            step=0.1
+            step=0.1,
+            help=esg_tooltip
         )
         msci_score = st.slider(
             "MSCI Score (0-10)",
             min_value=0.0,
             max_value=10.0,
             value=asset_to_add.msci_score if asset_to_add.msci_score is not None else 0.0,
-            step=0.1
+            step=0.1,
+            help=msci_tooltip
         )
-        dnsh_compliant = st.checkbox("DNSH Compliant", value=asset_to_add.dnsh_compliant)
+        dnsh_compliant = st.checkbox("DNSH Compliant", value=asset_to_add.dnsh_compliant, help=dnsh_tooltip)
     
     st.subheader("Renovation Information (if applicable)")
+    st.markdown("ℹ️ Based on EU Taxonomy criteria for building renovation", help=renovation_tooltip)
     col1, col2 = st.columns(2)
     
     with col1:
@@ -386,7 +589,8 @@ def display_direct_assets():
             min_value=0.0,
             max_value=100.0,
             value=asset_to_add.renovation_energy_reduction if asset_to_add.renovation_energy_reduction is not None else 0.0,
-            step=0.1
+            step=0.1,
+            help=renovation_tooltip
         )
     
     with col2:
@@ -395,7 +599,8 @@ def display_direct_assets():
             min_value=0.0,
             max_value=100.0,
             value=asset_to_add.renovation_ghg_reduction if asset_to_add.renovation_ghg_reduction is not None else 0.0,
-            step=0.1
+            step=0.1,
+            help=renovation_tooltip
         )
     
     if st.button("Save Asset"):
@@ -425,10 +630,25 @@ def display_direct_assets():
         
         update_calculator()
         st.experimental_rerun()
+    
+    # Add navigation buttons
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("← Previous: Fund Information"):
+            st.session_state["page"] = "Fund Information"
+            st.experimental_rerun()
+    with col2:
+        if st.button("Next: SCIs →"):
+            st.session_state["page"] = "SCIs"
+            st.experimental_rerun()
 
 def display_scis():
     """Display and manage SCIs (100% owned)."""
     st.header("SCIs (100% Owned)")
+    
+    # Add dashboard info message
+    st.info("💡 View calculation results on the Dashboard page")
     
     # Display existing SCIs
     if st.session_state.scis:
@@ -697,10 +917,25 @@ def display_scis():
             st.success("SCI added successfully!")
             update_calculator()
             st.experimental_rerun()
+    
+    # Add navigation buttons
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("← Previous: Direct Assets"):
+            st.session_state["page"] = "Direct Assets"
+            st.experimental_rerun()
+    with col2:
+        if st.button("Next: Controlled Participations →"):
+            st.session_state["page"] = "Controlled Participations"
+            st.experimental_rerun()
 
 def display_controlled_participations():
     """Display and manage controlled participations (>50%)."""
     st.header("Controlled Participations (>50%)")
+    
+    # Add dashboard info message
+    st.info("💡 View calculation results on the Dashboard page")
     
     # Display existing controlled participations
     if st.session_state.controlled_participations:
@@ -798,10 +1033,25 @@ def display_controlled_participations():
         
         update_calculator()
         st.experimental_rerun()
+    
+    # Add navigation buttons
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("← Previous: SCIs"):
+            st.session_state["page"] = "SCIs"
+            st.experimental_rerun()
+    with col2:
+        if st.button("Next: Uncontrolled Participations →"):
+            st.session_state["page"] = "Uncontrolled Participations"
+            st.experimental_rerun()
 
 def display_uncontrolled_participations():
     """Display and manage uncontrolled participations (20-50%)."""
     st.header("Uncontrolled Participations (20-50%)")
+    
+    # Add dashboard info message
+    st.info("💡 View calculation results on the Dashboard page")
     
     # Display existing uncontrolled participations
     if st.session_state.uncontrolled_participations:
@@ -900,10 +1150,25 @@ def display_uncontrolled_participations():
         
         update_calculator()
         st.experimental_rerun()
+    
+    # Add navigation buttons
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("← Previous: Controlled Participations"):
+            st.session_state["page"] = "Controlled Participations"
+            st.experimental_rerun()
+    with col2:
+        if st.button("Next: Minority Stakes →"):
+            st.session_state["page"] = "Minority Stakes"
+            st.experimental_rerun()
 
 def display_minority_stakes():
     """Display and manage minority stakes (<20%)."""
     st.header("Minority Stakes (<20%)")
+    
+    # Add dashboard info message
+    st.info("💡 View calculation results on the Dashboard page")
     
     # Display existing minority stakes
     if st.session_state.minority_stakes:
@@ -1002,10 +1267,25 @@ def display_minority_stakes():
         
         update_calculator()
         st.experimental_rerun()
+    
+    # Add navigation buttons
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("← Previous: Uncontrolled Participations"):
+            st.session_state["page"] = "Uncontrolled Participations"
+            st.experimental_rerun()
+    with col2:
+        if st.button("Next: PE Fund Participations →"):
+            st.session_state["page"] = "PE Fund Participations"
+            st.experimental_rerun()
 
 def display_pe_fund_participations():
     """Display and manage PE fund participations."""
     st.header("PE Fund Participations")
+    
+    # Add dashboard info message
+    st.info("💡 View calculation results on the Dashboard page")
     
     # Display existing PE fund participations
     if st.session_state.pe_fund_participations:
@@ -1101,6 +1381,18 @@ def display_pe_fund_participations():
         
         update_calculator()
         st.experimental_rerun()
+    
+    # Add navigation buttons
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("← Previous: Minority Stakes"):
+            st.session_state["page"] = "Minority Stakes"
+            st.experimental_rerun()
+    with col2:
+        if st.button("Go to Dashboard →"):
+            st.session_state["page"] = "Dashboard"
+            st.experimental_rerun()
 
 def update_calculator():
     """Update the calculator with the current session state data."""

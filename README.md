@@ -102,14 +102,37 @@ See `EXAMPLE.md` and `example.xlsx` for a detailed walkthrough with a sample fun
 
 ## Regulatory Compliance
 
-This calculator follows:
-- EU Taxonomy framework
-- SFDR Article 8/9 requirements
-- ASPIM and AMF guidelines for sustainable real estate
+This calculator follows specific regulatory frameworks and methodologies:
+
+- **EU Taxonomy for Sustainable Activities**
+  - Regulation (EU) 2020/852
+  - Technical Screening Criteria for buildings from Delegated Act C(2021) 2800
+  - Climate Delegated Act (EU) 2021/2139 for climate change mitigation and adaptation
+
+- **Sustainable Finance Disclosure Regulation (SFDR)**
+  - Regulation (EU) 2019/2088
+  - Article 8 and Article 9 fund classification requirements
+  - Regulatory Technical Standards (RTS) on ESG disclosures (C(2022) 1931)
+
+- **Industry Guidelines**
+  - ASPIM (Association française des Sociétés de Placement Immobilier) C-ISR methodologies
+  - AMF (Autorité des marchés financiers) Position-Recommendation DOC-2020-03
+  - ASPIM Position Paper on Taxonomy (note-de-position-aspim-taxinomie.pdf)
+  - ASPIM Article 29 LEC Position (note-de-position-article-29-lec.pdf)
 
 ## Documents
 
-This repository contains reference documents:
-- EU Commission guidelines
-- ASPIM position papers
-- Industry methodologies (including Rothschild approach)
+This repository contains reference documents that serve as the basis for the calculation methodology:
+
+- **EU Commission Guidelines**
+  - 221219-draft-commission-notice-disclosures-delegated-act-article-8.pdf
+
+- **ASPIM Documentation**
+  - ASPIM_C-ISR_Réunion #27_Support.pdf
+  - ASPIM_GT FinDur #20_CR_Commission comptable.pdf
+  - Informations a fournir par les placements collectifs integrant des approches extra-financieres.pdf
+
+- **Investment Manager Methodologies**
+  - Rothschild approach (edr-france-edr-europe-edr-suisse-definition-et-methodologie-investissement-durable.pdf)
+
+These documents provide the regulatory and methodological foundation for the sustainable investment calculations implemented in this tool.

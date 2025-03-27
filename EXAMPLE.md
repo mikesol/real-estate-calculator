@@ -112,8 +112,39 @@ When using the calculator in practice, verify:
 3. Correct calculation methods are applied based on ownership structure
 4. Consistent data sources are used for sustainability assessments
 
+## Regulatory Framework and Standards
+
+This calculator's methodology is based on the following regulatory frameworks and industry standards:
+
+### Key Regulations
+
+1. **EU Taxonomy (Regulation (EU) 2020/852)**
+   - Technical Screening Criteria for buildings in Climate Delegated Act (EU) 2021/2139
+   - Focus on climate change mitigation and adaptation objectives
+   - Specific thresholds for building energy performance (EPC A, top 15%, NZEB-10%)
+
+2. **Sustainable Finance Disclosure Regulation (SFDR) (Regulation (EU) 2019/2088)**
+   - Article 8: Products promoting environmental/social characteristics
+   - Article 9: Products with sustainable investment as their objective
+   - Regulatory Technical Standards (RTS) on ESG disclosures (C(2022) 1931)
+
+3. **French Regulatory Requirements**
+   - AMF Position-Recommendation DOC-2020-03 on ESG approaches
+   - Law on Energy and Climate (Article 29 LEC) disclosure requirements
+
+### Industry Methodologies
+
+- **ASPIM C-ISR** methodology for real estate funds
+  - Fund classification approach based on ASPIM_C-ISR_Réunion #27
+  - Proportional calculation methods for different ownership structures
+
+- **Investment Manager Best Practices**
+  - Rothschild's sustainable investment methodology (especially for thresholds)
+  - Look-through approach for fund structures
+
 ## Regulatory Notes
 
-- For Article 8 funds, a substantial proportion of sustainable investments strengthens the claim
-- For Article 9 funds, a predominant focus on sustainable investments is required
-- EU Taxonomy alignment percentages can be calculated separately by applying taxonomy-specific criteria
+- For **Article 8 funds**, a substantial proportion of sustainable investments (>50%) strengthens the claim
+- For **Article 9 funds**, a predominant focus on sustainable investments (typically >80%) is required
+- EU Taxonomy alignment percentages are distinct from but related to SFDR sustainable investment percentages
+- The calculation methodology follows ASPIM's guidance on applying proportionality based on ownership stake
